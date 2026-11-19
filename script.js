@@ -43,7 +43,7 @@
   let width = 0, height = 0, dpr = 1;
   let state = "menu";
   let difficulty = localStorage.getItem(STORAGE.difficulty) || "normal";
-  let score = 0, best = Number(localStorage.getItem(STORAGE.best) || 0);
+  let score = 0, best = Number(localStorage.getItem(STORAGE.best) || 0), recordAtStart = best;
   let level = 1, lives = 3, combo = 1, bestCombo = 1;
   let frame = 0, lastTime = 0, animationId = 0;
   let shake = 0, soundEnabled = localStorage.getItem(STORAGE.sound) !== "false";
@@ -163,7 +163,7 @@
 
   function startGame() {
     unlockAudio();
-    score = 0; level = 1; lives = DIFFICULTIES[difficulty].lives;
+    score = 0; recordAtStart = best; level = 1; lives = DIFFICULTIES[difficulty].lives;
     combo = 1; bestCombo = 1; shieldCharges = 0;
     activePowers = {}; powerDrops = []; particles = [];
     paddle.baseWidth = DIFFICULTIES[difficulty].paddle;
@@ -209,7 +209,7 @@
     ui.finalScore.textContent = score.toLocaleString("id-ID");
     ui.finalCombo.textContent = "x" + bestCombo;
     ui.finalLevel.textContent = level;
-    ui.gameOverMessage.textContent = score >= best && score > 0
+    ui.gameOverMessage.textContent = score > recordAtStart && score > 0
       ? "NEW RECORD! MUWANI LEGENDARY! 😹"
       : "Lumayan, tapi bisa lebih tinggi lagi!";
     ui.gameOver.classList.remove("hidden");
@@ -220,7 +220,10 @@
   function addScore(points) {
     const gained = points * combo;
     score += gained;
-    if (score > best) best = score;
+    if (score > best) {
+      best = score;
+      localStorage.setItem(STORAGE.best, String(best));
+    }
     combo = Math.min(combo + 1, 12);
     bestCombo = Math.max(bestCombo, combo);
     updateHUD();
