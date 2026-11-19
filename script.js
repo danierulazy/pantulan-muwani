@@ -24,8 +24,22 @@
   const STORAGE = {
     best: "muwaniArcadeBest",
     sound: "muwaniArcadeSound",
-    difficulty: "muwaniArcadeDifficulty"
+    difficulty: "muwaniArcadeDifficulty",
+    coins: "muwaniArcadeCoins",
+    ownedSkins: "muwaniArcadeOwnedSkins",
+    equippedSkin: "muwaniArcadeEquippedSkin"
   };
+
+  const SKINS = [
+    { id: "classic", name: "CLASSIC", color: "#65f5ed", price: 0, rarity: "STARTER" },
+    { id: "ice", name: "FROSTBYTE", color: "#8bdcff", price: 120, rarity: "RARE" },
+    { id: "sakura", name: "SAKURA", color: "#ff82bd", price: 180, rarity: "RARE" },
+    { id: "toxic", name: "TOXIC", color: "#a6ff62", price: 220, rarity: "EPIC" },
+    { id: "gold", name: "GOLD RUSH", color: "#ffd36a", price: 250, rarity: "EPIC" },
+    { id: "inferno", name: "INFERNO", color: "#ff704e", price: 300, rarity: "EPIC" },
+    { id: "galaxy", name: "GALAXY", color: "#b18aff", price: 350, rarity: "LEGENDARY" },
+    { id: "void", name: "VOID CORE", color: "#f0a2ff", price: 500, rarity: "MYTHIC" }
+  ];
 
   const DIFFICULTIES = {
     normal: { speed: 4.7, lives: 3, paddle: 116, label: "NORMAL" },
@@ -44,6 +58,10 @@
   let state = "menu";
   let difficulty = localStorage.getItem(STORAGE.difficulty) || "normal";
   let score = 0, best = Number(localStorage.getItem(STORAGE.best) || 0), recordAtStart = best;
+  let coins = Number(localStorage.getItem(STORAGE.coins) || 0);
+  let ownedSkins = JSON.parse(localStorage.getItem(STORAGE.ownedSkins) || '["classic"]');
+  let equippedSkin = localStorage.getItem(STORAGE.equippedSkin) || "classic";
+  let coinsEarnedThisRun = 0;
   let level = 1, lives = 3, combo = 1, bestCombo = 1;
   let frame = 0, lastTime = 0, animationId = 0;
   let shake = 0, soundEnabled = localStorage.getItem(STORAGE.sound) !== "false";
@@ -136,6 +154,8 @@
     ui.score.textContent = formatScore(score);
     ui.best.textContent = formatScore(best);
     ui.menuBest.textContent = best.toLocaleString("id-ID");
+    $("#menuCoins").textContent = coins.toLocaleString("id-ID");
+    $("#shopCoins").textContent = coins.toLocaleString("id-ID");
     ui.level.textContent = String(level).padStart(2, "0");
     ui.lives.textContent = lives > 0 ? Array.from({ length: lives }, () => "♥").join(" ") : "—";
     ui.combo.textContent = "COMBO x" + combo;
@@ -172,6 +192,7 @@
     paddle.targetX = paddle.x;
     balls = [makeBall()];
     ui.menu.classList.add("hidden");
+    $("#shopOverlay").classList.add("hidden");
     ui.pause.classList.add("hidden");
     ui.gameOver.classList.add("hidden");
     setState("playing");
@@ -206,7 +227,11 @@
       best = score;
       localStorage.setItem(STORAGE.best, String(best));
     }
+    coinsEarnedThisRun = Math.max(5, Math.floor(score / 100) + level * 3);
+    coins += coinsEarnedThisRun;
+    localStorage.setItem(STORAGE.coins, String(coins));
     ui.finalScore.textContent = score.toLocaleString("id-ID");
+    $("#rewardLine").textContent = "✦ +" + coinsEarnedThisRun + " COINS EARNED";
     ui.finalCombo.textContent = "x" + bestCombo;
     ui.finalLevel.textContent = level;
     ui.gameOverMessage.textContent = score > recordAtStart && score > 0
@@ -461,12 +486,15 @@
     ctx.restore();
   }
 
+  function getSkin() { return SKINS.find(skin => skin.id === equippedSkin) || SKINS[0]; }
+
   function drawPaddle() {
     const x = paddle.x, y = paddle.y, w = paddle.width, h = paddle.height;
+    const skin = getSkin();
     ctx.save();
-    ctx.shadowBlur = 22; ctx.shadowColor = "#65f5ed";
+    ctx.shadowBlur = 22; ctx.shadowColor = skin.color;
     const gradient = ctx.createLinearGradient(x, y, x, y + h);
-    gradient.addColorStop(0, "#d9fffc"); gradient.addColorStop(.35, "#65f5ed"); gradient.addColorStop(1, "#20a9ad");
+    gradient.addColorStop(0, "#ffffff"); gradient.addColorStop(.35, skin.color); gradient.addColorStop(1, skin.color + "99");
     roundRect(x, y, w, h, 7, gradient);
     ctx.shadowBlur = 0;
     ctx.fillStyle = "rgba(255,255,255,.65)";
@@ -487,16 +515,17 @@
   }
 
   function drawBall(ball) {
+    const skin = getSkin();
     ctx.save();
     ball.trail.forEach((point, i) => {
       ctx.globalAlpha = (i / ball.trail.length) * .23;
-      ctx.fillStyle = "#65f5ed";
+      ctx.fillStyle = skin.color;
       ctx.beginPath(); ctx.arc(point.x, point.y, ball.radius * (i / ball.trail.length), 0, Math.PI * 2); ctx.fill();
     });
     ctx.globalAlpha = 1;
     const glow = ctx.createRadialGradient(ball.x - 3, ball.y - 3, 1, ball.x, ball.y, ball.radius * 2.8);
-    glow.addColorStop(0, "#ffffff"); glow.addColorStop(.35, "#bafffb"); glow.addColorStop(1, "rgba(101,245,237,0)");
-    ctx.fillStyle = glow; ctx.shadowBlur = 20; ctx.shadowColor = "#65f5ed";
+    glow.addColorStop(0, "#ffffff"); glow.addColorStop(.35, skin.color); glow.addColorStop(1, "rgba(101,245,237,0)");
+    ctx.fillStyle = glow; ctx.shadowBlur = 20; ctx.shadowColor = skin.color;
     ctx.beginPath(); ctx.arc(ball.x, ball.y, ball.radius * 1.65, 0, Math.PI * 2); ctx.fill();
     ctx.fillStyle = "#ffffff"; ctx.beginPath(); ctx.arc(ball.x, ball.y, ball.radius * .68, 0, Math.PI * 2); ctx.fill();
     ctx.restore();
@@ -588,6 +617,8 @@
     });
   });
 
+  $("#openShopButton").addEventListener("click", openShop);
+  $("#closeShopButton").addEventListener("click", closeShop);
   $("#startButton").addEventListener("click", startGame);
   $("#retryButton").addEventListener("click", startGame);
   $("#resumeButton").addEventListener("click", resumeGame);
@@ -601,10 +632,75 @@
   });
   $("#soundButton").addEventListener("click", () => setSound(!soundEnabled));
 
+
+  function renderShop() {
+    const grid = $("#skinGrid");
+    grid.innerHTML = "";
+    $("#shopCoins").textContent = coins.toLocaleString("id-ID");
+    SKINS.forEach(skin => {
+      const owned = ownedSkins.includes(skin.id);
+      const equipped = equippedSkin === skin.id;
+      const card = document.createElement("article");
+      card.className = "skin-card" + (equipped ? " equipped" : "");
+      card.style.setProperty("--skin-color", skin.color);
+      const preview = document.createElement("div");
+      preview.className = "skin-preview";
+      const orb = document.createElement("span");
+      orb.className = "skin-orb";
+      preview.appendChild(orb);
+      const name = document.createElement("strong");
+      name.className = "skin-name";
+      name.textContent = skin.name;
+      const rarity = document.createElement("small");
+      rarity.className = "skin-rarity";
+      rarity.textContent = skin.rarity;
+      const action = document.createElement("button");
+      action.className = "skin-action";
+      action.type = "button";
+      action.textContent = equipped ? "EQUIPPED" : owned ? "EQUIP" : "✦ " + skin.price;
+      action.disabled = equipped;
+      action.addEventListener("click", () => {
+        if (ownedSkins.includes(skin.id)) {
+          equippedSkin = skin.id;
+          localStorage.setItem(STORAGE.equippedSkin, equippedSkin);
+          showToast(skin.name + " EQUIPPED!");
+        } else if (coins >= skin.price) {
+          coins -= skin.price;
+          ownedSkins.push(skin.id);
+          equippedSkin = skin.id;
+          localStorage.setItem(STORAGE.coins, String(coins));
+          localStorage.setItem(STORAGE.ownedSkins, JSON.stringify(ownedSkins));
+          localStorage.setItem(STORAGE.equippedSkin, equippedSkin);
+          showToast(skin.name + " UNLOCKED!");
+        } else {
+          showToast("NOT ENOUGH COINS — PLAY MORE!");
+        }
+        renderShop();
+        updateHUD();
+        draw();
+      });
+      card.append(preview, name, rarity, action);
+      grid.appendChild(card);
+    });
+  }
+
+  function openShop() {
+    renderShop();
+    ui.menu.classList.add("hidden");
+    $("#shopOverlay").classList.remove("hidden");
+  }
+
+  function closeShop() {
+    $("#shopOverlay").classList.add("hidden");
+    ui.menu.classList.remove("hidden");
+  }
+
   function init() {
     const savedDifficulty = document.querySelector('[data-difficulty="' + difficulty + '"]') || document.querySelector('[data-difficulty="normal"]');
     document.querySelectorAll(".difficulty").forEach(item => item.classList.toggle("active", item === savedDifficulty));
     difficulty = savedDifficulty.dataset.difficulty;
+    if (!ownedSkins.includes("classic")) ownedSkins.unshift("classic");
+    if (!ownedSkins.includes(equippedSkin)) equippedSkin = "classic";
     setSound(soundEnabled);
     updateHUD();
     resize();
