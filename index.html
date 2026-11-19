@@ -7,12 +7,9 @@
   <link rel="stylesheet" href="style.css">
 </head>
 <body>
-
   <canvas id="canvas"></canvas>
-
   <div id="score">Skor: 0</div>
   <div id="topScore">Top Score: 0</div>
-
   <div id="gameOverScreen">
     <div class="gameOverBox">
       <h1>GAME OVER CIK 😹</h1>
@@ -20,11 +17,10 @@
       <button id="retryBtn">Try Again</button>
     </div>
   </div>
-
-  <audio id="bgm" loop autoplay>
-    <source src="ambatukambgm.mp3" type="audio/mp3">
+  <!-- Audio diputar setelah interaksi pertama karena aturan autoplay browser. -->
+  <audio id="bgm" loop preload="auto">
+    <source src="./ambatukambgm.mp3" type="audio/mpeg">
   </audio>
-
   <script src="script.js"></script>
 </body>
 </html>
