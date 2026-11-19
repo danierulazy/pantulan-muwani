@@ -33,8 +33,31 @@ const topScoreText = document.getElementById("topScore");
 const gameOverScreen = document.getElementById("gameOverScreen");
 const finalScoreText = document.getElementById("finalScore");
 const retryBtn = document.getElementById("retryBtn");
+const bgm = document.getElementById("bgm");
 
 topScoreText.textContent = "Top Score: " + topScore;
+
+// BACKGROUND MUSIC
+bgm.volume = 0.4;
+let bgmStarted = false;
+
+function startBGM() {
+  if (bgmStarted) return;
+
+  bgm.play()
+    .then(() => {
+      bgmStarted = true;
+      document.removeEventListener("pointerdown", startBGM);
+      document.removeEventListener("keydown", startBGM);
+      console.log("BGM berhasil diputar!");
+    })
+    .catch((error) => {
+      console.warn("BGM belum bisa diputar:", error);
+    });
+}
+
+document.addEventListener("pointerdown", startBGM);
+document.addEventListener("keydown", startBGM);
 
 let gameRunning = true;
 const particles = [];
@@ -90,19 +113,14 @@ function endGame() {
 function resetGame() {
   score = 0;
   scoreText.textContent = "Skor: 0";
-
   ball.x = canvas.width / 2;
   ball.y = canvas.height / 2;
   ball.dx = 8;
   ball.dy = -8;
-
   paddle.x = canvas.width / 2 - paddle.width / 2;
-
   particles.length = 0;
-
   gameOverScreen.style.display = "none";
   gameRunning = true;
-
   update();
 }
 
@@ -110,7 +128,6 @@ function update() {
   if (!gameRunning) return;
 
   ctx.clearRect(0, 0, canvas.width, canvas.height);
-
   drawPaddle();
   drawBall();
   drawParticles();
@@ -121,13 +138,11 @@ function update() {
 
   if (ball.y + ball.dy < ball.radius) {
     ball.dy = -ball.dy;
-  } 
-  else if (ball.y + ball.dy > paddle.y - ball.radius) {
+  } else if (ball.y + ball.dy > paddle.y - ball.radius) {
     if (ball.x > paddle.x && ball.x < paddle.x + paddle.width) {
       ball.dy = -ball.dy;
       score++;
       scoreText.textContent = "Skor: " + score;
-
       createTrail(ball.x, paddle.y);
 
       if (score > topScore) {
@@ -135,8 +150,7 @@ function update() {
         localStorage.setItem("topScoreMuwani", topScore);
         topScoreText.textContent = "Top Score: " + topScore;
       }
-    } 
-    else if (ball.y > canvas.height + ball.radius) {
+    } else if (ball.y > canvas.height + ball.radius) {
       endGame();
       return;
     }
@@ -144,9 +158,7 @@ function update() {
 
   ball.x += ball.dx;
   ball.y += ball.dy;
-
   createTrail(ball.x, ball.y);
-
   requestAnimationFrame(update);
 }
 
@@ -155,21 +167,16 @@ canvas.addEventListener("touchmove", (e) => {
   e.preventDefault();
   const touchX = e.touches[0].clientX;
   paddle.x = touchX - paddle.width / 2;
-
   if (paddle.x < 0) paddle.x = 0;
-  if (paddle.x + paddle.width > canvas.width)
-    paddle.x = canvas.width - paddle.width;
+  if (paddle.x + paddle.width > canvas.width) paddle.x = canvas.width - paddle.width;
 });
 
 /* MOUSE SUPPORT */
 canvas.addEventListener("mousemove", (e) => {
   paddle.x = e.clientX - paddle.width / 2;
-
   if (paddle.x < 0) paddle.x = 0;
-  if (paddle.x + paddle.width > canvas.width)
-    paddle.x = canvas.width - paddle.width;
+  if (paddle.x + paddle.width > canvas.width) paddle.x = canvas.width - paddle.width;
 });
 
 retryBtn.addEventListener("click", resetGame);
-
 update();
