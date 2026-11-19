@@ -259,6 +259,25 @@
     }
   }
 
+  // Signature visual Pantulan Muwani: butiran putih berkilau yang
+  // terus tertinggal di belakang bola, seperti versi original.
+  function spawnWhiteBallSparkles(ball) {
+    for (let i = 0; i < 2; i++) {
+      particles.push({
+        x: ball.x + random(-3, 3),
+        y: ball.y + random(-3, 3),
+        vx: random(-1.15, 1.15) - ball.vx * .10,
+        vy: random(-1.15, 1.15) - ball.vy * .10,
+        life: random(.72, 1),
+        decay: random(.045, .075),
+        size: random(1.1, 2.5),
+        color: "#ffffff"
+      });
+    }
+    // Batasi jumlah partikel agar tetap ringan di HP dan laptop.
+    if (particles.length > 650) particles.splice(0, particles.length - 650);
+  }
+
   function spawnPowerup(x, y) {
     const types = ["slow", "wide", "shield", "multi"];
     const type = types[Math.floor(Math.random() * types.length)];
@@ -320,6 +339,7 @@
       ball.y += ball.vy * step;
       ball.trail.push({ x: ball.x, y: ball.y, alpha: .48 });
       if (ball.trail.length > 8) ball.trail.shift();
+      spawnWhiteBallSparkles(ball);
 
       if (ball.x < ball.radius + 2 || ball.x > width - ball.radius - 2) {
         ball.vx *= -1;
