@@ -67,7 +67,21 @@
         </div>
       </div>
       <button class="primary-button" id="startButton">START GAME <span>↗</span></button>
+      <div class="menu-actions">
+        <button class="secondary-button" id="openShopButton">✦ BALL GARAGE <span id="menuCoins">0</span> COINS</button>
+      </div>
       <div class="menu-footer"><span>BEST SCORE <b id="menuBest">0</b></span><span>MADE FOR MUWANI ♥</span></div>
+    </div>
+  </div>
+
+  <div class="overlay hidden" id="shopOverlay">
+    <div class="modal shop-modal">
+      <div class="shop-heading">
+        <div><div class="eyebrow">CUSTOMIZATION LAB</div><h2>BALL GARAGE<span>.</span></h2><p class="modal-copy">Pilih gaya bola dan paddle favoritmu. Semua skin hanya kosmetik.</p></div>
+        <div class="coin-wallet">✦ <b id="shopCoins">0</b><small>COINS</small></div>
+      </div>
+      <div class="skin-grid" id="skinGrid"></div>
+      <button class="secondary-button" id="closeShopButton">← BACK TO MENU</button>
     </div>
   </div>
 
@@ -91,6 +105,7 @@
         <div><small>BEST COMBO</small><strong id="finalCombo">x1</strong></div>
         <div><small>LEVEL REACHED</small><strong id="finalLevel">1</strong></div>
       </div>
+      <div class="reward-line" id="rewardLine">✦ +0 COINS EARNED</div>
       <button class="primary-button" id="retryButton">PLAY AGAIN <span>↗</span></button>
       <button class="secondary-button" id="homeButton">MAIN MENU</button>
     </div>
