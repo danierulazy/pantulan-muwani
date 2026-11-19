@@ -1,26 +1,103 @@
 <!DOCTYPE html>
 <html lang="id">
 <head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Pantulan Muwani Loh ya😹</title>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="theme-color" content="#09090f">
+  <title>PANTULAN MUWANI — Arcade Edition</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@500;600;700;800;900&family=Rajdhani:wght@400;500;600;700&display=swap" rel="stylesheet">
   <link rel="stylesheet" href="style.css">
 </head>
 <body>
-  <canvas id="canvas"></canvas>
-  <div id="score">Skor: 0</div>
-  <div id="topScore">Top Score: 0</div>
-  <div id="gameOverScreen">
-    <div class="gameOverBox">
-      <h1>GAME OVER CIK 😹</h1>
-      <p id="finalScore"></p>
-      <button id="retryBtn">Try Again</button>
+  <div class="ambient ambient-one"></div>
+  <div class="ambient ambient-two"></div>
+  <canvas id="gameCanvas" aria-label="Area permainan Pantulan Muwani"></canvas>
+
+  <header class="topbar">
+    <a class="brand" href="#" aria-label="Pantulan Muwani home">
+      <span class="brand-mark">P<span>✦</span></span>
+      <span class="brand-name">PANTULAN <b>MUWANI</b><small>ARCADE EDITION</small></span>
+    </a>
+    <div class="top-actions">
+      <button class="icon-button" id="soundButton" title="Toggle sound" aria-label="Toggle sound">♫</button>
+      <button class="icon-button" id="pauseButton" title="Pause game" aria-label="Pause game" disabled>Ⅱ</button>
+    </div>
+  </header>
+
+  <main class="game-shell">
+    <section class="hud" aria-live="polite">
+      <div class="hud-card"><span class="hud-label">SCORE</span><strong id="scoreValue">000000</strong></div>
+      <div class="hud-card"><span class="hud-label">BEST</span><strong id="bestValue">000000</strong></div>
+      <div class="hud-card"><span class="hud-label">LEVEL</span><strong id="levelValue">01</strong></div>
+      <div class="hud-card"><span class="hud-label">LIVES</span><strong id="livesValue">♥ ♥ ♥</strong></div>
+    </section>
+
+    <section class="status-row">
+      <div class="status-pill"><span class="status-dot"></span><span id="statusText">READY PLAYER?</span></div>
+      <div class="combo-display" id="comboDisplay">COMBO x1</div>
+    </section>
+
+    <div class="game-frame">
+      <div class="game-topline"><span>MUWANI SYSTEM <i>///</i> 001</span><span id="powerStatus">NO ACTIVE POWER</span></div>
+      <div class="canvas-wrap"><canvas id="canvas"></canvas><div class="level-flash" id="levelFlash"></div></div>
+      <div class="game-bottomline"><span>MOVE <b>← →</b> / MOUSE / TOUCH</span><span>PAUSE <b>SPACE</b></span></div>
+    </div>
+
+    <div class="powerup-legend">
+      <span><i class="legend-dot cyan"></i> SLOW</span>
+      <span><i class="legend-dot violet"></i> WIDE</span>
+      <span><i class="legend-dot gold"></i> SHIELD</span>
+      <span><i class="legend-dot pink"></i> MULTI</span>
+    </div>
+  </main>
+
+  <div class="overlay" id="menuOverlay">
+    <div class="modal menu-modal">
+      <div class="eyebrow">WELCOME TO THE CHAOS</div>
+      <div class="hero-title">PANTULAN<br><span>MUWANI.</span></div>
+      <p class="modal-copy">Pantulkan bolanya. Kejar skor tertinggi. Jangan sampai jatuh, CIK! 😹</p>
+      <div class="difficulty-picker">
+        <span class="field-label">SELECT DIFFICULTY</span>
+        <div class="difficulty-options">
+          <button class="difficulty active" data-difficulty="normal"><b>NORMAL</b><small>Balanced</small></button>
+          <button class="difficulty" data-difficulty="hard"><b>HARD</b><small>Fast & furious</small></button>
+          <button class="difficulty" data-difficulty="insane"><b>INSANE</b><small>No mercy</small></button>
+        </div>
+      </div>
+      <button class="primary-button" id="startButton">START GAME <span>↗</span></button>
+      <div class="menu-footer"><span>BEST SCORE <b id="menuBest">0</b></span><span>MADE FOR MUWANI ♥</span></div>
     </div>
   </div>
-  <!-- Audio diputar setelah interaksi pertama karena aturan autoplay browser. -->
-  <audio id="bgm" loop preload="auto">
-    <source src="./ambatukambgm.mp3" type="audio/mpeg">
-  </audio>
+
+  <div class="overlay hidden" id="pauseOverlay">
+    <div class="modal compact-modal">
+      <div class="eyebrow">SYSTEM PAUSED</div>
+      <h2>TAKE A BREAK.</h2>
+      <p class="modal-copy">Bolanya juga butuh istirahat... mungkin.</p>
+      <button class="primary-button" id="resumeButton">RESUME <span>▶</span></button>
+      <button class="secondary-button" id="pauseRestartButton">RESTART RUN</button>
+    </div>
+  </div>
+
+  <div class="overlay hidden" id="gameOverOverlay">
+    <div class="modal compact-modal">
+      <div class="eyebrow">SESSION COMPLETE</div>
+      <h2 class="gameover-title">GAME OVER.</h2>
+      <p class="modal-copy" id="gameOverMessage">Lumayan, tapi bisa lebih tinggi!</p>
+      <div class="result-grid">
+        <div><small>FINAL SCORE</small><strong id="finalScore">0</strong></div>
+        <div><small>BEST COMBO</small><strong id="finalCombo">x1</strong></div>
+        <div><small>LEVEL REACHED</small><strong id="finalLevel">1</strong></div>
+      </div>
+      <button class="primary-button" id="retryButton">PLAY AGAIN <span>↗</span></button>
+      <button class="secondary-button" id="homeButton">MAIN MENU</button>
+    </div>
+  </div>
+
+  <div class="toast" id="toast"></div>
+  <audio id="bgm" loop preload="auto"><source src="./ambatukambgm.mp3" type="audio/mpeg"></audio>
   <script src="script.js"></script>
 </body>
 </html>
