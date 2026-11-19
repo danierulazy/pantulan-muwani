@@ -112,3 +112,33 @@ button { font: inherit; }
   .canvas-wrap { height: 48vh; min-height: 230px; }
   .powerup-legend { padding: 9px 0; }
 }
+
+
+/* BALL GARAGE + COSMETIC COLLECTION */
+.menu-actions { margin-top: 10px; }
+.menu-actions .secondary-button { margin: 0; border-color: rgba(169,139,255,.35); color: #d9ceff; background: rgba(169,139,255,.07); }
+.menu-actions .secondary-button span { float: right; color: var(--gold); }
+.shop-modal { width: min(100%, 650px); max-height: min(88vh, 760px); overflow-y: auto; }
+.shop-heading { display: flex; justify-content: space-between; align-items: flex-start; gap: 15px; }
+.shop-heading h2 { margin: 0; font: 900 clamp(25px,5vw,38px) Orbitron; }
+.shop-heading h2 span { color: var(--cyan); }
+.shop-heading .modal-copy { margin: 8px 0 18px; }
+.coin-wallet { flex: 0 0 auto; padding: 10px 13px; border-radius: 12px; border: 1px solid rgba(255,211,106,.25); background: rgba(255,211,106,.07); color: var(--gold); font: 800 16px Orbitron; }
+.coin-wallet small { display: block; color: #a99b77; font: 700 8px Orbitron; letter-spacing: 2px; margin-top: 4px; }
+.skin-grid { display: grid; grid-template-columns: repeat(3,1fr); gap: 10px; margin: 12px 0 18px; }
+.skin-card { min-width: 0; padding: 12px 9px; border: 1px solid var(--line); border-radius: 13px; background: rgba(255,255,255,.025); color: white; text-align: center; }
+.skin-card.equipped { border-color: var(--skin-color); background: color-mix(in srgb, var(--skin-color) 9%, transparent); box-shadow: 0 0 22px color-mix(in srgb, var(--skin-color) 12%, transparent); }
+.skin-preview { height: 74px; display: grid; place-items: center; position: relative; margin-bottom: 8px; overflow: hidden; border-radius: 9px; background: radial-gradient(circle, color-mix(in srgb, var(--skin-color) 15%, transparent), transparent 70%); }
+.skin-orb { width: 23px; height: 23px; border-radius: 50%; background: radial-gradient(circle at 32% 28%, #fff 0 8%, var(--skin-color) 35%, color-mix(in srgb, var(--skin-color) 35%, #000) 100%); box-shadow: 0 0 8px var(--skin-color), 0 0 23px var(--skin-color); }
+.skin-orb::after { content: ""; display: block; width: 5px; height: 5px; background: white; border-radius: 50%; margin: 5px 0 0 5px; box-shadow: 0 0 8px white; }
+.skin-name { display: block; font: 800 10px Orbitron; letter-spacing: .5px; }
+.skin-rarity { display: block; margin: 5px 0 9px; color: var(--muted); font: 700 8px Rajdhani; letter-spacing: 1px; }
+.skin-action { width: 100%; padding: 8px 4px; border: 1px solid color-mix(in srgb, var(--skin-color) 45%, transparent); border-radius: 8px; color: var(--skin-color); background: color-mix(in srgb, var(--skin-color) 8%, transparent); cursor: pointer; font: 800 8px Orbitron; }
+.skin-action:disabled { opacity: .55; cursor: default; }
+.reward-line { padding: 11px; margin: -9px 0 15px; border-radius: 9px; color: var(--gold); background: rgba(255,211,106,.07); font: 800 10px Orbitron; letter-spacing: 1px; }
+@media (max-width: 520px) {
+  .shop-modal { padding: 20px 15px; }
+  .skin-grid { grid-template-columns: repeat(2,1fr); gap: 8px; }
+  .skin-preview { height: 60px; }
+  .shop-heading { gap: 8px; }
+}
